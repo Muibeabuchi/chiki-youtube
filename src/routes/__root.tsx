@@ -88,27 +88,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <div className="h-screen flex flex-col min-h-0">
-          <div className="bg-slate-900 border-b border-slate-800 flex items-center justify-between py-4 px-8 box-border">
-            <div className="flex items-center gap-4">
-              <div>
-                <Link to="/" className="block leading-tight">
-                  <div className="font-black text-2xl text-white">Trellaux</div>
-                  <div className="text-slate-500">a TanStack Demo</div>
-                </Link>
-              </div>
-              <LoadingIndicator />
-            </div>
-            <div>
-              <Link to="/">Home</Link>
-            </div>
-          </div>
-
-          <div className="flex-grow min-h-0 h-full flex flex-col">
-            {children}
-            <Toaster />
-          </div>
-        </div>
+        {children}
+        <Toaster />
         <ReactQueryDevtools />
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
