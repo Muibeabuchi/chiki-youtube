@@ -11,11 +11,12 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import * as React from "react";
 import { Toaster } from "react-hot-toast";
 import type { QueryClient } from "@tanstack/react-query";
-import { NotFound } from "~/components/NotFound";
-import appCss from "~/styles/app.css?url";
-import { seo } from "~/utils/seo";
-import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
-import { Loader } from "~/components/Loader";
+import { NotFound } from "@/components/NotFound";
+// import appCss from "@/styles/app.css?url";
+import rootCss from "@/styles/globals.css?url";
+import { seo } from "@/utils/seo";
+import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
+import { Loader } from "@/components/Loader";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -36,7 +37,10 @@ export const Route = createRootRouteWithContext<{
       }),
     ],
     links: [
-      { rel: "stylesheet", href: appCss },
+      {
+        rel: "stylesheet",
+        href: rootCss,
+      },
       {
         rel: "apple-touch-icon",
         sizes: "180x180",
