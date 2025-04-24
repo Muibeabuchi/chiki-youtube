@@ -13,8 +13,11 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AuthLayoutRouteImport } from './routes/_auth-layout/route'
 import { Route as homeHomeLayoutRouteImport } from './routes/(home)/_home-layout/route'
 import { Route as homeHomeLayoutIndexImport } from './routes/(home)/_home-layout/index'
+import { Route as AuthLayoutSignUpSplatImport } from './routes/_auth-layout/sign-up.$'
+import { Route as AuthLayoutSignInSplatImport } from './routes/_auth-layout/sign-in.$'
 import { Route as homeHomeLayoutPlaylistsImport } from './routes/(home)/_home-layout/playlists'
 
 // Create Virtual Routes
@@ -25,6 +28,11 @@ const homeImport = createFileRoute('/(home)')()
 
 const homeRoute = homeImport.update({
   id: '/(home)',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthLayoutRouteRoute = AuthLayoutRouteImport.update({
+  id: '/_auth-layout',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,6 +47,18 @@ const homeHomeLayoutIndexRoute = homeHomeLayoutIndexImport.update({
   getParentRoute: () => homeHomeLayoutRouteRoute,
 } as any)
 
+const AuthLayoutSignUpSplatRoute = AuthLayoutSignUpSplatImport.update({
+  id: '/sign-up/$',
+  path: '/sign-up/$',
+  getParentRoute: () => AuthLayoutRouteRoute,
+} as any)
+
+const AuthLayoutSignInSplatRoute = AuthLayoutSignInSplatImport.update({
+  id: '/sign-in/$',
+  path: '/sign-in/$',
+  getParentRoute: () => AuthLayoutRouteRoute,
+} as any)
+
 const homeHomeLayoutPlaylistsRoute = homeHomeLayoutPlaylistsImport.update({
   id: '/playlists',
   path: '/playlists',
@@ -49,6 +69,13 @@ const homeHomeLayoutPlaylistsRoute = homeHomeLayoutPlaylistsImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_auth-layout': {
+      id: '/_auth-layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthLayoutRouteImport
+      parentRoute: typeof rootRoute
+    }
     '/(home)': {
       id: '/(home)'
       path: '/'
@@ -70,6 +97,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof homeHomeLayoutPlaylistsImport
       parentRoute: typeof homeHomeLayoutRouteImport
     }
+    '/_auth-layout/sign-in/$': {
+      id: '/_auth-layout/sign-in/$'
+      path: '/sign-in/$'
+      fullPath: '/sign-in/$'
+      preLoaderRoute: typeof AuthLayoutSignInSplatImport
+      parentRoute: typeof AuthLayoutRouteImport
+    }
+    '/_auth-layout/sign-up/$': {
+      id: '/_auth-layout/sign-up/$'
+      path: '/sign-up/$'
+      fullPath: '/sign-up/$'
+      preLoaderRoute: typeof AuthLayoutSignUpSplatImport
+      parentRoute: typeof AuthLayoutRouteImport
+    }
     '/(home)/_home-layout/': {
       id: '/(home)/_home-layout/'
       path: '/'
@@ -81,6 +122,20 @@ declare module '@tanstack/react-router' {
 }
 
 // Create and export the route tree
+
+interface AuthLayoutRouteRouteChildren {
+  AuthLayoutSignInSplatRoute: typeof AuthLayoutSignInSplatRoute
+  AuthLayoutSignUpSplatRoute: typeof AuthLayoutSignUpSplatRoute
+}
+
+const AuthLayoutRouteRouteChildren: AuthLayoutRouteRouteChildren = {
+  AuthLayoutSignInSplatRoute: AuthLayoutSignInSplatRoute,
+  AuthLayoutSignUpSplatRoute: AuthLayoutSignUpSplatRoute,
+}
+
+const AuthLayoutRouteRouteWithChildren = AuthLayoutRouteRoute._addFileChildren(
+  AuthLayoutRouteRouteChildren,
+)
 
 interface homeHomeLayoutRouteRouteChildren {
   homeHomeLayoutPlaylistsRoute: typeof homeHomeLayoutPlaylistsRoute
@@ -106,42 +161,56 @@ const homeRouteChildren: homeRouteChildren = {
 const homeRouteWithChildren = homeRoute._addFileChildren(homeRouteChildren)
 
 export interface FileRoutesByFullPath {
+  '': typeof AuthLayoutRouteRouteWithChildren
   '/': typeof homeHomeLayoutIndexRoute
   '/playlists': typeof homeHomeLayoutPlaylistsRoute
+  '/sign-in/$': typeof AuthLayoutSignInSplatRoute
+  '/sign-up/$': typeof AuthLayoutSignUpSplatRoute
 }
 
 export interface FileRoutesByTo {
+  '': typeof AuthLayoutRouteRouteWithChildren
   '/playlists': typeof homeHomeLayoutPlaylistsRoute
+  '/sign-in/$': typeof AuthLayoutSignInSplatRoute
+  '/sign-up/$': typeof AuthLayoutSignUpSplatRoute
   '/': typeof homeHomeLayoutIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/_auth-layout': typeof AuthLayoutRouteRouteWithChildren
   '/(home)': typeof homeRouteWithChildren
   '/(home)/_home-layout': typeof homeHomeLayoutRouteRouteWithChildren
   '/(home)/_home-layout/playlists': typeof homeHomeLayoutPlaylistsRoute
+  '/_auth-layout/sign-in/$': typeof AuthLayoutSignInSplatRoute
+  '/_auth-layout/sign-up/$': typeof AuthLayoutSignUpSplatRoute
   '/(home)/_home-layout/': typeof homeHomeLayoutIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/playlists'
+  fullPaths: '' | '/' | '/playlists' | '/sign-in/$' | '/sign-up/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/playlists' | '/'
+  to: '' | '/playlists' | '/sign-in/$' | '/sign-up/$' | '/'
   id:
     | '__root__'
+    | '/_auth-layout'
     | '/(home)'
     | '/(home)/_home-layout'
     | '/(home)/_home-layout/playlists'
+    | '/_auth-layout/sign-in/$'
+    | '/_auth-layout/sign-up/$'
     | '/(home)/_home-layout/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
+  AuthLayoutRouteRoute: typeof AuthLayoutRouteRouteWithChildren
   homeRoute: typeof homeRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  AuthLayoutRouteRoute: AuthLayoutRouteRouteWithChildren,
   homeRoute: homeRouteWithChildren,
 }
 
@@ -155,7 +224,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/_auth-layout",
         "/(home)"
+      ]
+    },
+    "/_auth-layout": {
+      "filePath": "_auth-layout/route.tsx",
+      "children": [
+        "/_auth-layout/sign-in/$",
+        "/_auth-layout/sign-up/$"
       ]
     },
     "/(home)": {
@@ -175,6 +252,14 @@ export const routeTree = rootRoute
     "/(home)/_home-layout/playlists": {
       "filePath": "(home)/_home-layout/playlists.tsx",
       "parent": "/(home)/_home-layout"
+    },
+    "/_auth-layout/sign-in/$": {
+      "filePath": "_auth-layout/sign-in.$.tsx",
+      "parent": "/_auth-layout"
+    },
+    "/_auth-layout/sign-up/$": {
+      "filePath": "_auth-layout/sign-up.$.tsx",
+      "parent": "/_auth-layout"
     },
     "/(home)/_home-layout/": {
       "filePath": "(home)/_home-layout/index.tsx",
