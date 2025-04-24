@@ -8,63 +8,141 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
+import { Route as homeHomeLayoutRouteImport } from './routes/(home)/_home-layout/route'
+import { Route as homeHomeLayoutIndexImport } from './routes/(home)/_home-layout/index'
+import { Route as homeHomeLayoutPlaylistsImport } from './routes/(home)/_home-layout/playlists'
+
+// Create Virtual Routes
+
+const homeImport = createFileRoute('/(home)')()
 
 // Create/Update Routes
 
-const IndexRoute = IndexImport.update({
+const homeRoute = homeImport.update({
+  id: '/(home)',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const homeHomeLayoutRouteRoute = homeHomeLayoutRouteImport.update({
+  id: '/_home-layout',
+  getParentRoute: () => homeRoute,
+} as any)
+
+const homeHomeLayoutIndexRoute = homeHomeLayoutIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => homeHomeLayoutRouteRoute,
+} as any)
+
+const homeHomeLayoutPlaylistsRoute = homeHomeLayoutPlaylistsImport.update({
+  id: '/playlists',
+  path: '/playlists',
+  getParentRoute: () => homeHomeLayoutRouteRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/(home)': {
+      id: '/(home)'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexImport
+      preLoaderRoute: typeof homeImport
       parentRoute: typeof rootRoute
+    }
+    '/(home)/_home-layout': {
+      id: '/(home)/_home-layout'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof homeHomeLayoutRouteImport
+      parentRoute: typeof homeRoute
+    }
+    '/(home)/_home-layout/playlists': {
+      id: '/(home)/_home-layout/playlists'
+      path: '/playlists'
+      fullPath: '/playlists'
+      preLoaderRoute: typeof homeHomeLayoutPlaylistsImport
+      parentRoute: typeof homeHomeLayoutRouteImport
+    }
+    '/(home)/_home-layout/': {
+      id: '/(home)/_home-layout/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof homeHomeLayoutIndexImport
+      parentRoute: typeof homeHomeLayoutRouteImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface homeHomeLayoutRouteRouteChildren {
+  homeHomeLayoutPlaylistsRoute: typeof homeHomeLayoutPlaylistsRoute
+  homeHomeLayoutIndexRoute: typeof homeHomeLayoutIndexRoute
+}
+
+const homeHomeLayoutRouteRouteChildren: homeHomeLayoutRouteRouteChildren = {
+  homeHomeLayoutPlaylistsRoute: homeHomeLayoutPlaylistsRoute,
+  homeHomeLayoutIndexRoute: homeHomeLayoutIndexRoute,
+}
+
+const homeHomeLayoutRouteRouteWithChildren =
+  homeHomeLayoutRouteRoute._addFileChildren(homeHomeLayoutRouteRouteChildren)
+
+interface homeRouteChildren {
+  homeHomeLayoutRouteRoute: typeof homeHomeLayoutRouteRouteWithChildren
+}
+
+const homeRouteChildren: homeRouteChildren = {
+  homeHomeLayoutRouteRoute: homeHomeLayoutRouteRouteWithChildren,
+}
+
+const homeRouteWithChildren = homeRoute._addFileChildren(homeRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof homeHomeLayoutIndexRoute
+  '/playlists': typeof homeHomeLayoutPlaylistsRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/playlists': typeof homeHomeLayoutPlaylistsRoute
+  '/': typeof homeHomeLayoutIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
+  '/(home)': typeof homeRouteWithChildren
+  '/(home)/_home-layout': typeof homeHomeLayoutRouteRouteWithChildren
+  '/(home)/_home-layout/playlists': typeof homeHomeLayoutPlaylistsRoute
+  '/(home)/_home-layout/': typeof homeHomeLayoutIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/playlists'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/playlists' | '/'
+  id:
+    | '__root__'
+    | '/(home)'
+    | '/(home)/_home-layout'
+    | '/(home)/_home-layout/playlists'
+    | '/(home)/_home-layout/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  homeRoute: typeof homeRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  homeRoute: homeRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +155,30 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/(home)"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/(home)": {
+      "filePath": "(home)/_home-layout",
+      "children": [
+        "/(home)/_home-layout"
+      ]
+    },
+    "/(home)/_home-layout": {
+      "filePath": "(home)/_home-layout/route.tsx",
+      "parent": "/(home)",
+      "children": [
+        "/(home)/_home-layout/playlists",
+        "/(home)/_home-layout/"
+      ]
+    },
+    "/(home)/_home-layout/playlists": {
+      "filePath": "(home)/_home-layout/playlists.tsx",
+      "parent": "/(home)/_home-layout"
+    },
+    "/(home)/_home-layout/": {
+      "filePath": "(home)/_home-layout/index.tsx",
+      "parent": "/(home)/_home-layout"
     }
   }
 }
