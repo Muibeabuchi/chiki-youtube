@@ -123,7 +123,7 @@ function RootComponent() {
 function RootDocument({ children }: { children: React.ReactNode }) {
   const context = useRouteContext({ from: Route.id });
   return (
-    <ClerkProvider>
+    <ClerkProvider afterSignOutUrl={"/"}>
       <ConvexProviderWithClerk client={context.convexClient} useAuth={useAuth}>
         <html>
           <head>

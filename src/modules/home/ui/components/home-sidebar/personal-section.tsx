@@ -6,6 +6,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import useOpenSignInModal from "@/modules/home/hooks/useOpenSignInModal";
 import { Link } from "@tanstack/react-router";
 import { HistoryIcon, ListVideoIcon, ThumbsUpIcon } from "lucide-react";
 
@@ -33,6 +34,7 @@ const items = [
 ] as const;
 
 const PersonalSection = (props: PersonalSectionProps) => {
+  const { handleClick } = useOpenSignInModal();
   return (
     <SidebarGroup>
       <SidebarGroupLabel>You</SidebarGroupLabel>
@@ -44,7 +46,9 @@ const PersonalSection = (props: PersonalSectionProps) => {
                 tooltip={item.title}
                 asChild
                 isActive={false} //TODO: Change to look at current pathname
-                onClick={() => {}}
+                onClick={(e) => {
+                  handleClick(e, item.auth);
+                }}
               >
                 <Link to={item.to} className="flex items-center gap-4">
                   <item.icon />
