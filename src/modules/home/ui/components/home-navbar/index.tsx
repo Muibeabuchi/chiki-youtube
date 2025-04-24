@@ -14,12 +14,7 @@ export default function HomeNavbar({}: HomeNavbarProps) {
           <SidebarTrigger />
           <Link to="/">
             <div className="flex items-center p-4 gap-1">
-              <img
-                src="/public/youtube-logo.svg"
-                alt="logo"
-                height={32}
-                width={32}
-              />
+              <img src="/youtube-logo.svg" alt="logo" height={32} width={32} />
               <p className="text-lg font-inter font-semibold tracking-tight">
                 ChikiTube
               </p>
