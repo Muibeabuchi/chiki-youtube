@@ -1,4 +1,6 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools/production";
+import { ClerkProvider, useAuth } from "@clerk/tanstack-react-start";
+import { ConvexProviderWithClerk } from "convex/react-clerk";
 import {
   Link,
   Outlet,
@@ -6,20 +8,41 @@ import {
   useRouterState,
   HeadContent,
   Scripts,
+  useRouteContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import * as React from "react";
 import { Toaster } from "react-hot-toast";
 import type { QueryClient } from "@tanstack/react-query";
 import { NotFound } from "@/components/NotFound";
-// import appCss from "@/styles/app.css?url";
 import rootCss from "@/styles/globals.css?url";
 import { seo } from "@/utils/seo";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { Loader } from "@/components/Loader";
+import { ConvexReactClient } from "convex/react";
+import { ConvexQueryClient } from "@convex-dev/react-query";
+import { createServerFn } from "@tanstack/react-start";
+import { getAuth } from "@clerk/tanstack-react-start/server";
+import { getWebRequest } from "@tanstack/react-start/server";
+
+const fetchClerkAuth = createServerFn({ method: "GET" }).handler(async () => {
+  const request = getWebRequest();
+  if (!request) return;
+  const auth = await getAuth(request, {
+    secretKey: process.env.CLERK_SECRET_KEY,
+  });
+  const token = await auth.getToken({ template: "convex" });
+
+  return {
+    userId: auth.userId,
+    token,
+  };
+});
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
+  convexClient: ConvexReactClient;
+  convexQueryClient: ConvexQueryClient;
 }>()({
   head: () => ({
     meta: [
@@ -62,6 +85,22 @@ export const Route = createRootRouteWithContext<{
       { rel: "icon", href: "/favicon.ico" },
     ],
   }),
+  beforeLoad: async (ctx) => {
+    const auth = await fetchClerkAuth();
+    if (!auth) return;
+    const { userId, token } = auth;
+
+    // During SSR only (the only time serverHttpClient exists),
+    // set the Clerk auth token to make HTTP queries with.
+    if (token) {
+      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
+    }
+
+    return {
+      userId,
+      token,
+    };
+  },
   errorComponent: (props) => {
     return (
       <RootDocument>
@@ -82,19 +121,24 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const context = useRouteContext({ from: Route.id });
   return (
-    <html>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Toaster />
-        <ReactQueryDevtools />
-        <TanStackRouterDevtools position="bottom-left" />
-        <Scripts />
-      </body>
-    </html>
+    <ClerkProvider>
+      <ConvexProviderWithClerk client={context.convexClient} useAuth={useAuth}>
+        <html>
+          <head>
+            <HeadContent />
+          </head>
+          <body>
+            {children}
+            <Toaster />
+            <ReactQueryDevtools />
+            <TanStackRouterDevtools position="bottom-left" />
+            <Scripts />
+          </body>
+        </html>
+      </ConvexProviderWithClerk>
+    </ClerkProvider>
   );
 }
 
