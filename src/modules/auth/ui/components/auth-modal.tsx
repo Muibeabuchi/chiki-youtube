@@ -88,16 +88,28 @@ import {
 import { Button } from "@/components/ui/button";
 
 import useSignInModal from "../../hooks/store/auth-modal-store";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useLocation } from "@tanstack/react-router";
 
 const SignInModal = () => {
   const { isOpen, closeModal } = useSignInModal();
   const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuthActions();
+
+  const location = useLocation();
+
+  console.log(location.pathname);
+  console.log(location.href);
+  console.log(location.state);
 
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
       // Implement your Google sign-in logic here
       // For example: await signInWithGoogle();
+      await signIn("google", {
+        redirectTo: `${location.href}`,
+      });
 
       // Close modal on successful sign in
       closeModal();
