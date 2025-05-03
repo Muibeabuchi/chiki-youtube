@@ -13,14 +13,16 @@ import { User, Settings, HelpCircle, LogOut } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useCurrentUser } from "../../api/use-get-current-user";
 import UserButtonSkeleton from "./user-button-skeleton";
+import { useConvexAuth } from "convex/react";
 
 export const UserButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { signOut } = useAuthActions();
+  const { isLoading: loadingUser } = useConvexAuth();
 
   const { data: userInfo, isLoading } = useCurrentUser();
 
-  if (isLoading) {
+  if (isLoading || loadingUser) {
     return <UserButtonSkeleton />;
   }
   // Get initials from name for the avatar fallback
