@@ -21,6 +21,7 @@ import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import SignInModal from "@/modules/auth/ui/components/auth-modal";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -98,6 +99,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <body>
           {children}
           <Toaster />
+          <SignInModal />
           <ReactQueryDevtools />
           <TanStackRouterDevtools position="bottom-left" />
           <Scripts />
