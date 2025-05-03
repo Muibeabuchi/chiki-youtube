@@ -1,9 +1,8 @@
-import { Hono } from "hono";
-import { HonoWithConvex, HttpRouterWithHono } from "convex-helpers/server/hono";
-import { ActionCtx } from "./_generated/server";
+import { httpRouter } from "convex/server";
+import { auth } from "./auth";
 
-const app: HonoWithConvex<ActionCtx> = new Hono();
+const http = httpRouter();
 
-// Add your routes to `app`. See below
+auth.addHttpRoutes(http);
 
-export default new HttpRouterWithHono(app);
+export default http;
